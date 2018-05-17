@@ -1,4 +1,4 @@
-package lfsocket
+package socket
 
 import (
 	"fmt"

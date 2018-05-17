@@ -1,4 +1,4 @@
-package lfsocket
+package socket
 
 import (
 	"fmt"
@@ -67,5 +67,7 @@ func (this *Client) disconnect() {
 	if !this.Flag {
 		this.Conn.Close()
 	}
+	fmt.Println(ser.allClients)
+	fmt.Println(this.AuthKey)
 	delete(ser.allClients, this.AuthKey)
 }
