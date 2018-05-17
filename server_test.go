@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 	"math/rand"
+	"net/http"
 )
 
 var (
@@ -14,9 +15,7 @@ var (
 	maxConns = 100
 	errCnt   = 10
 )
-
 func Test_Server(t *testing.T) {
-
 	ser := NewServer(network, address, timeout, maxConns, errCnt)
 
 	go processClient(ser)
