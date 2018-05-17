@@ -15,8 +15,8 @@ func (this *server) newConnection(conn net.Conn) (*Client, error) {
 	if len(this.allClients) >= this.maxConns {
 		return nil, ErrTooManyConns
 	}
-	key := "123456"
-	authKey := "123456"
+	key := generateAuthKey()
+	authKey := generateAuthKey()	//生成鉴权key,由客户端去解密,再次传递过来
 	client := &Client{
 		Key:      key,
 		AuthKey:  authKey,
@@ -67,7 +67,5 @@ func (this *Client) disconnect() {
 	if !this.Flag {
 		this.Conn.Close()
 	}
-	fmt.Println(ser.allClients)
-	fmt.Println(this.AuthKey)
 	delete(ser.allClients, this.AuthKey)
 }

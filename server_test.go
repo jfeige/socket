@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"math/rand"
 )
 
 var (
@@ -32,7 +33,9 @@ func processClient(ser *server) {
 	for {
 		select {
 		case client := <-ser.Clients:
+
 			go processRch(client)
+
 			go processWch(client)
 
 		}
@@ -48,7 +51,7 @@ func processRch(client *Client) {
 				//通道已关闭
 				break
 			}
-			fmt.Println(tmp_data)
+			fmt.Printf("收到客户端请求数据:%s",string(tmp_data))
 			//data,err := resolveReceive(tmp_data)
 			//具体业务逻辑
 			//fmt.Printf("客户端-key:%s,%v,%v",client.Key,data,err)
