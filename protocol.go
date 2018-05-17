@@ -11,6 +11,11 @@ var (
 	ContentLen = 4
 )
 
+var(
+	commands = []string{"msg","close"}
+)
+
+
 //解包
 func UnPacket(buffer []byte, dataChan chan []byte) []byte {
 	length := len(buffer)

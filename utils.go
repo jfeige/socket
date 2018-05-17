@@ -4,6 +4,7 @@ import (
 	rd "math/rand"
 	"time"
 	"strings"
+	"reflect"
 )
 
 
@@ -57,4 +58,29 @@ func RandStr(length int,format ...string)string{
 	}
 
 	return string(result)
+}
+
+
+
+func InArray(obj interface{},target interface{})bool{
+
+	target_tp := reflect.TypeOf(target)
+	target_vl := reflect.ValueOf(target)
+
+	switch target_tp.Kind() {
+	case reflect.Array,reflect.Slice:
+		for i := 0; i < target_vl.Len();i++{
+			if obj == target_vl.Index(i).Interface(){
+				return true
+			}
+		}
+	case reflect.Map:
+		for _,v := range target_vl.MapKeys(){
+			if obj == target_vl.MapIndex(v).Interface(){
+				return true
+			}
+		}
+	}
+
+	return false
 }
