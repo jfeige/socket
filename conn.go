@@ -37,7 +37,7 @@ func (this *server) newConnection(conn net.Conn) (*Client, error) {
 //处理客户端连接
 func (this *server) handleConnection(client *Client) {
 	//这里是鉴权，往客户端写入一个加密的字符串，由客户端去解析。
-	//如果5秒没有响应，或者客户端无法解析，则认为该客户端非法，服务端会自动抛弃该连接
+	//如果5秒没有响应，或者客户端下次请求时没有带上正确的key，则认为该客户端非法，服务端会自动抛弃该连接
 	client.Conn.Write([]byte(client.AuthKey))
 	client.Conn.SetDeadline(time.Now().Add(5 * time.Second)) //5秒后，没有响应，断开连接
 
