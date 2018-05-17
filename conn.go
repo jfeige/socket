@@ -53,8 +53,7 @@ func (this *server) handleConnection(client *Client) {
 			if err == io.EOF {
 				//客户端已关闭连接
 			} else if strings.Contains(err.Error(), "use of closed network connection") {
-				fmt.Println("服务器端已断开连接!")
-				client.Flag = false
+				client.Flag = false	//服务器端已断开连接!
 			} else {
 				//其他异常
 				fmt.Printf("conn.Read() has error:%v\n", err)
