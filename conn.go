@@ -6,6 +6,7 @@ import (
 	"net"
 	"strings"
 	"time"
+	"encoding/json"
 )
 
 //Client对象的一些初始化操作
@@ -32,11 +33,21 @@ func (this *server) newConnection(conn net.Conn) (*Client, error) {
 	return client, nil
 }
 
+//验证客户端是否有效连接
+func (this *server) authClient(client *Client){
+	data := make(map[string]interface{})
+	data["authKey"] = client.AuthKey
+	ret,_ := json.Marshal(data)
+	client.Conn.Write(ret)
+}
+
+
 //处理客户端连接
 func (this *server) handleConnection(client *Client) {
 	//这里是鉴权，往客户端写入一个加密的字符串，由客户端去解析。
 	//如果5秒没有响应，或者客户端下次请求时没有带上正确的key，则认为该客户端非法，服务端会自动抛弃该连接
-	client.Conn.Write([]byte(client.AuthKey))
+	//client.Conn.Write([]byte(client.AuthKey))
+	this.authClient(client)
 	client.Conn.SetDeadline(time.Now().Add(5 * time.Second)) //5秒后，没有响应，断开连接
 
 	buffer := make([]byte, 2048)
