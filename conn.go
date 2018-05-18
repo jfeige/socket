@@ -1,12 +1,12 @@
 package socket
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
 	"strings"
 	"time"
-	"encoding/json"
 )
 
 //Client对象的一些初始化操作
@@ -17,7 +17,7 @@ func (this *server) newConnection(conn net.Conn) (*Client, error) {
 		return nil, ErrTooManyConns
 	}
 	key := generateAuthKey()
-	authKey := generateAuthKey()	//生成鉴权key,由客户端去解密,再次传递过来
+	authKey := generateAuthKey() //生成鉴权key,由客户端去解密,再次传递过来
 	client := &Client{
 		Key:      key,
 		AuthKey:  authKey,
@@ -34,13 +34,12 @@ func (this *server) newConnection(conn net.Conn) (*Client, error) {
 }
 
 //验证客户端是否有效连接
-func (this *server) authClient(client *Client){
+func (this *server) authClient(client *Client) {
 	data := make(map[string]interface{})
 	data["authKey"] = client.AuthKey
-	ret,_ := json.Marshal(data)
+	ret, _ := json.Marshal(data)
 	client.Conn.Write(Packet(ret))
 }
-
 
 //处理客户端连接
 func (this *server) handleConnection(client *Client) {
@@ -57,11 +56,11 @@ func (this *server) handleConnection(client *Client) {
 		if err != nil {
 			if err == io.EOF {
 				//客户端已关闭连接
-				fmt.Printf("client:%v is disconnect!\n",client.AuthKey)
+				fmt.Printf("client:%v is disconnect!\n", client.AuthKey)
 			} else if strings.Contains(err.Error(), "use of closed network connection") {
-				fmt.Printf("server has closed!client:%v\n",client.AuthKey)
+				fmt.Printf("server has closed!client:%v\n", client.AuthKey)
 			} else {
-				fmt.Printf("client:%v,conn.Read() has error:%v\n", client.AuthKey,err)
+				fmt.Printf("client:%v,conn.Read() has error:%v\n", client.AuthKey, err)
 			}
 			client.disconnect()
 			return
@@ -70,10 +69,6 @@ func (this *server) handleConnection(client *Client) {
 		client.Conn.SetDeadline(time.Now().Add(time.Duration(this.timeout) * time.Second)) //设置超时时间
 	}
 }
-
-
-
-
 
 //关闭连接
 func (this *Client) disconnect() {

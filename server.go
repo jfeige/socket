@@ -77,7 +77,7 @@ func (this *server) StartListener() error {
 
 //停止服务,处理现有的客户端连接
 func (this *server) StopServer() {
-	for _,client := range this.allClients{
+	for _, client := range this.allClients {
 		client.disconnect()
 	}
 }

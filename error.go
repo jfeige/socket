@@ -13,9 +13,8 @@ var (
 	ErrTooManyConns = errors.New("error:too many connection on server!")
 )
 
+func lockArgsErr(args string) error {
 
-func lockArgsErr(args string)error{
-
-	return fmt.Errorf("error:lock parameter:%s",args)
+	return fmt.Errorf("error:lock parameter:%s", args)
 
 }

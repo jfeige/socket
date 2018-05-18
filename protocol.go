@@ -11,10 +11,9 @@ var (
 	ContentLen = 4
 )
 
-var(
-	commands = []string{"msg","close","ping"}
+var (
+	commands = []string{"msg", "close", "ping"}
 )
-
 
 //解包
 func UnPacket(buffer []byte, dataChan chan []byte) []byte {
