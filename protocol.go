@@ -12,7 +12,7 @@ var (
 )
 
 var(
-	commands = []string{"msg","close","test"}
+	commands = []string{"msg","close","ping"}
 )
 
 
