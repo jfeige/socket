@@ -57,8 +57,17 @@ func (this *Client)processRch() {
 			if err != nil{
 				this.disconnect()
 			}
-			fmt.Println(data) //模拟业务处理
+			//模拟具体业务，给客户端返回值
+			fmt.Printf("receive client data:%v\n",data)
 			//如需要给客户端返回值，则往各自的WChan通道里，写入返回值即可
+			info,ok := data["info"]
+			if ok{
+				data := make(map[string]interface{})
+				data["info"] = info
+				ret,_ := json.Marshal(data)
+				this.WChan <- Packet(ret)
+			}
+
 		}
 	}
 }
@@ -66,7 +75,7 @@ func (this *Client)processRch() {
 
 func (this *Client)resolveReceive(tmp_data []byte)(data map[string]interface{},err error){
 	data = make(map[string]interface{})
-	err = json.Unmarshal(tmp_data,data)
+	err = json.Unmarshal(tmp_data,&data)
 	if err != nil{
 		return nil,err
 	}

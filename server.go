@@ -36,7 +36,7 @@ type Client struct {
 }
 
 func NewServer(network, address string, timeout, maxConns, maxErrCnt int) *server {
-	ser := &server{
+	ser = &server{
 		network:    network,
 		address:    address,
 		timeout:    timeout,

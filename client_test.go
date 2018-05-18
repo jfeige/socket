@@ -1,7 +1,6 @@
 package socket
 
 import (
-	"testing"
 	"net"
 	"fmt"
 	"io"
@@ -20,7 +19,7 @@ var(
 	wg sync.WaitGroup
 )
 
-func Test_Client(t *testing.T){
+func main(){
 	addr,err := net.ResolveTCPAddr(cnetwork,caddress)
 	if err != nil{
 		fmt.Println(err)
@@ -31,6 +30,7 @@ func Test_Client(t *testing.T){
 		fmt.Println(err)
 		return
 	}
+	fmt.Println("client begin.....")
 	wg.Add(1)
 	//启用新线程读取服务器返回值
 	go receiveResult(conn)
@@ -40,7 +40,8 @@ func Test_Client(t *testing.T){
 	for i := 0; i < 10;i++{
 		data := make(map[string]interface{})
 		data["auth_key"] = AuthKey
-		data["cmd"] = "test" + strconv.Itoa(i)
+		data["cmd"] = "msg"
+		data["info"] = "test" + strconv.Itoa(i)
 		ret,_ := json.Marshal(data)
 		n,err := conn.Write(Packet(ret))
 		fmt.Printf("send sucess:nb.:%d,%d,error:%v\n",i+1,n,err)
@@ -52,7 +53,7 @@ func Test_Client(t *testing.T){
 
 func receiveResult(conn *net.TCPConn){
 
-	buffer := make([]byte,2048)
+	var buffer []byte
 	//处理服务端返回值
 	go processRCh()
 
@@ -62,7 +63,7 @@ func receiveResult(conn *net.TCPConn){
 		if err != nil{
 			if err == io.EOF{
 				//服务器端已关闭连接
-				fmt.Println("服务器已关闭连接")
+				fmt.Println("server hs closed!")
 			}else {
 				fmt.Printf("other error:%v",err)
 			}
@@ -85,8 +86,9 @@ func processRCh(){
 				continue
 			}
 			fmt.Printf("receive server result:%v\n",ret)
-			AuthKey,exists := ret["authKey"]
+			key,exists := ret["authKey"]
 			if exists{
+				AuthKey = key
 				fmt.Printf("connect sucess!AuthKey:%v\n",AuthKey)
 				wg.Done()
 			}
