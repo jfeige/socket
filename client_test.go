@@ -42,7 +42,7 @@ func Test_Client(t *testing.T){
 		data["auth_key"] = AuthKey
 		data["cmd"] = "test" + strconv.Itoa(i)
 		ret,_ := json.Marshal(data)
-		n,err := conn.Write(ret)
+		n,err := conn.Write(Packet(ret))
 		fmt.Printf("send sucess:nb.:%d,%d,error:%v\n",i+1,n,err)
 		time.Sleep(3*time.Second)
 	}
