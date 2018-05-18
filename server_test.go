@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	"math/rand"
-	"net/http"
+	"errors"
+	"encoding/json"
 )
 
 var (
@@ -33,40 +33,70 @@ func processClient(ser *server) {
 		select {
 		case client := <-ser.Clients:
 
-			go processRch(client)
+			go client.processRch()
 
-			go processWch(client)
+			go client.processWch()
 
 		}
 	}
 }
 
+
+
+
 //处理接收的数据
-func processRch(client *Client) {
+func (this *Client)processRch() {
 	for {
 		select {
-		case tmp_data, ok := <-client.RChan:
+		case tmp_data, ok := <-this.RChan:
 			if !ok {
 				//通道已关闭
 				break
 			}
-			fmt.Printf("收到客户端请求数据:%s",string(tmp_data))
-			//data,err := resolveReceive(tmp_data)
-			//具体业务逻辑
-			//fmt.Printf("客户端-key:%s,%v,%v",client.Key,data,err)
+			data,err := this.resolveReceive(tmp_data)
+			if err != nil{
+				this.disconnect()
+			}
+			fmt.Println(data) //模拟业务处理
+			//如需要给客户端返回值，则往各自的WChan通道里，写入返回值即可
 		}
 	}
 }
 
+
+func (this *Client)resolveReceive(tmp_data []byte)(data map[string]interface{},err error){
+	data = make(map[string]interface{})
+	err = json.Unmarshal(tmp_data,data)
+	if err != nil{
+		return nil,err
+	}
+	//进行一些必需的判断
+	auth_key,exists := data["auth_key"]
+	if !exists{
+		return nil,lockArgsErr("auth_key")
+	}
+	if auth_key != this.AuthKey{
+		return nil,errors.New("wrong key!")
+	}
+	cmd,exists := data["cmd"]
+	if !exists{
+		return nil,lockArgsErr("cmd")
+	}
+	if !InArray(cmd,commands){
+		return nil,errors.New("wrong cmd!")
+	}
+	return
+}
+
 //发送数据到客户端
-func processWch(client *Client) {
+func (this *Client)processWch() {
 	for {
 		select {
-		case tmp_data, ok := <-client.WChan:
+		case tmp_data, ok := <-this.WChan:
 			if !ok {
 				break
 			}
-			client.Conn.Write(tmp_data)
+			this.Conn.Write(tmp_data)
 		}
 	}
 }
